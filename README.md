@@ -7,3 +7,6 @@ The algorithms are written primarily in python.
 The following algorithms are present at current:
 - Dijkstra's algorithm
 - A* search
+- DFS
+- BFS
+- Custom Maze Generators

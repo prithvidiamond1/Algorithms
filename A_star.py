@@ -1,42 +1,42 @@
 
 from copy import deepcopy
 from math import inf, sqrt
+import maze_builderV2 as mb
 
 order = 10
-# space = ['X']+['_' for x in range(order)]+['X']
-# maze = [deepcopy(space) for x in range(order)]
-# maze.append(['X' for x in range(order+2)])
-# maze.insert(0, ['X' for x in range(order+2)])
+space = ['X']+['_' for x in range(order)]+['X']
+maze = [deepcopy(space) for x in range(order)]
+maze.append(['X' for x in range(order+2)])
+maze.insert(0, ['X' for x in range(order+2)])
 
-maze = [['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'],
-        ['X', 'S', 'X', '_', '_', '_', 'X', '_', '_', '_', 'X', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X', '_', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X', '_', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
-        ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X'],
-        ['X', '_', '_', '_', 'X', '_', '_', '_', 'X', '_', 'O', 'X'],
-        ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X']]
-
-
-maze[1][1] = 'S'  # Initializing a start position
-maze[order][order] = 'O'  # Initializing a end position
+# maze = [['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X'],
+#         ['X', 'S', 'X', '_', '_', '_', 'X', '_', '_', '_', 'X', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X', '_', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X', '_', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', '_', 'X'],
+#         ['X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', '_', 'X', 'X'],
+#         ['X', '_', '_', '_', 'X', '_', '_', '_', 'X', '_', 'O', 'X'],
+#         ['X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X', 'X']]
 
 finalpos = (order, order)
 
 pos = (1, 1)
 
-route = []  # will contain co-ordinates of points on shortest route
+maze[pos[0]][pos[1]] = 'S'  # Initializing a start position
+maze[finalpos[0]][finalpos[1]] = 'O'  # Initializing a end position
 
+mb.mazebuilder(maze=maze)
 
 def spit():
     for x in maze:
         print(x)
 
-# spit()
+spit()
+print()
 
 mazemap = {}
 
@@ -46,7 +46,6 @@ def scan():  # Converts raw map/maze into a suitable datastructure.
             mazemap[(x, y)] = {}
             t = [(x-1, y), (x+1, y), (x, y-1), (x, y+1)]
             for z in t:
-                # print(z[0], z[1], maze[z[0]][z[1]])
                 if maze[z[0]][z[1]] == 'X':
                     pass
                 else:
@@ -91,38 +90,41 @@ while unvisited != {}:
         
     unvisited.pop(curnode)
 
-for x in distances:
-    print(x, ':', distances[x])
+# for x in distances:
+#     print(x, ':', distances[x])
 
-print()
+# print()
 
-for x in paths:
-    print(x, ':', paths[x])
+# for x in paths:
+#     print(x, ':', paths[x])
 
-print()
+# print()
 
 
-def shortestroute(paths, distances, start, end):
+def shortestroute(paths, start, end):
     shortestpath = []
+    try:
+        def rec(start, end):
+            if end == start:
+                shortestpath.append(end)
+                return shortestpath[::-1]
+            else:
+                shortestpath.append(end)
+                return rec(start, paths[end])
+        return rec(start, end)
+    except KeyError:
+        return False
 
-    def rec(start, end):
-        if end == start:
-            shortestpath.append(end)
-            return shortestpath[::-1]
+finalpath = shortestroute(paths, pos, finalpos)
+
+if finalpath:
+    for x in finalpath:
+        if x == pos or x == finalpos:
+            pass
         else:
-            shortestpath.append(end)
-            return rec(start, paths[end])
-    return rec(start, end)
-
-
-finalpath = shortestroute(paths, distances, pos, finalpos)
-print(finalpath)
-print()
-
-for x in finalpath:
-    if x == pos or x == finalpos:
-        pass
-    else:
-        maze[x[0]][x[1]] = 'W'
+            maze[x[0]][x[1]] = 'W'
+else:
+    print("This maze not solvable, Blyat!")
+    print()
 
 spit()
